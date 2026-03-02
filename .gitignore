@@ -1,0 +1,23 @@
+ ##
+ # GitIgnore file.
+ # Prevents git from commiting any unwanted files.
+ ##
+
+# Do not track environment settings.
+.env/
+.venv/
+env/
+venv/
+env.py
+*env.py
+
+# Do not track development-related Django files.
+*.sqlite3
+
+# Do not track compiled CSS/JS files.
+dist/
+node_modules/
+*.sass-cache/delete commit
+*.css
+*.css.map
+package-lock.json
