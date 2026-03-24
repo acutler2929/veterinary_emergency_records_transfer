@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}PetChart Dashboard{% endblock %}
+{% block title %}Vert Dashboard{% endblock %}
 {% block page_heading %}Care records for every pet{% endblock %}
 
 {% block content %}
@@ -8,7 +8,7 @@
     <div>
         <p class="eyebrow">Designed for simple storage</p>
         <h2>Store the information you actually need during a vet visit.</h2>
-        <p class="hero-copy">PetChart keeps owner contacts, visit notes, vaccines, and prescriptions in one place with a cleaner portal layout inspired by patient apps like MyChart.</p>
+        <p class="hero-copy">Vert keeps owner contacts, visit notes, vaccines, and prescriptions in one place with a cleaner portal layout inspired by patient apps like MyChart.</p>
         <div class="hero-actions">
             <a class="button" href="{% url 'records:pet_add' %}">Add a pet</a>
             <a class="button button--ghost" href="{% url 'records:owner_add' %}">Add an owner</a>
