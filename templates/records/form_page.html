@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ form_title }} | PetChart{% endblock %}
+{% block page_heading %}{{ form_title }}{% endblock %}
+
+{% block content %}
+<section class="form-layout">
+    <article class="content-card">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Record entry</p>
+                <h2>{{ form_title }}</h2>
+            </div>
+        </div>
+        <p class="section-copy">{{ form_intro }}</p>
+
+        <form method="post" class="record-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="error-box">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field{% if field.field.widget.input_type == 'checkbox' %} form-field--checkbox{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <p class="help-text">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <p class="error-text">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button class="button" type="submit">{{ submit_label }}</button>
+                <a class="button button--ghost" href="{{ cancel_url }}">Cancel</a>
+            </div>
+        </form>
+    </article>
+
+    <aside class="content-card info-panel">
+        {% if pet %}
+        <p class="eyebrow">Patient context</p>
+        <h2>{{ pet.name }}</h2>
+        <p>{{ pet.get_species_display }}{% if pet.breed %} &middot; {{ pet.breed }}{% endif %}</p>
+        <dl class="mini-stats mini-stats--stacked">
+            <div>
+                <dt>Owner</dt>
+                <dd>{{ pet.owner.full_name }}</dd>
+            </div>
+            <div>
+                <dt>Age</dt>
+                <dd>{{ pet.age_display }}</dd>
+            </div>
+            <div>
+                <dt>Weight</dt>
+                <dd>{% if pet.weight_lbs %}{{ pet.weight_lbs }} lbs{% else %}Not recorded{% endif %}</dd>
+            </div>
+        </dl>
+        {% else %}
+        <p class="eyebrow">Workflow tip</p>
+        <h2>Recommended order</h2>
+        <p>Add an owner first, then create one or more pet profiles under that household.</p>
+        {% endif %}
+
+        <div class="info-panel__callout">
+            <h3>What this page stores</h3>
+            <p>Keep entries short and structured so the dashboard stays easy to scan during appointments or phone calls.</p>
+        </div>
+    </aside>
+</section>
+{% endblock %}

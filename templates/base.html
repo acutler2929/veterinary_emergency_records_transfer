@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}PetChart{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand-block">
+                <p class="brand-kicker">Pet health portal</p>
+                <a class="brand" href="{% url 'records:dashboard' %}">PetChart</a>
+                <p class="brand-copy">A calmer, simpler record system for pet families and vet history.</p>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Primary">
+                <a href="{% url 'records:dashboard' %}">Dashboard</a>
+                <a href="{% url 'records:owner_add' %}">Add Owner</a>
+                <a href="{% url 'records:pet_add' %}">Add Pet</a>
+                <a href="/admin/">Admin</a>
+            </nav>
+
+            <div class="sidebar-note">
+                <h2>Portal focus</h2>
+                <p>Keep core records easy to scan: contact info, vet visits, vaccines, medications, and alerts.</p>
+            </div>
+        </aside>
+
+        <main class="main-panel">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Simplified care records</p>
+                    <h1>{% block page_heading %}Pet health at a glance{% endblock %}</h1>
+                </div>
+                <div class="topbar-actions">
+                    <a class="button button--ghost" href="{% url 'records:owner_add' %}">New owner</a>
+                    <a class="button" href="{% url 'records:pet_add' %}">New pet</a>
+                </div>
+            </header>
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

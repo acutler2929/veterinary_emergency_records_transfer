@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pet.name }} | PetChart{% endblock %}
+{% block page_heading %}{{ pet.name }}'s health record{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+    <div>
+        <p class="eyebrow">Patient overview</p>
+        <h2>{{ pet.name }}</h2>
+        <p class="hero-copy">
+            {{ pet.get_species_display }}{% if pet.breed %} &middot; {{ pet.breed }}{% endif %}
+            {% if pet.owner %} &middot; Owner: {{ pet.owner.full_name }}{% endif %}
+        </p>
+    </div>
+    <div class="hero-actions">
+        <a class="button button--ghost" href="{% url 'records:visit_add' pet.pk %}">Log visit</a>
+        <a class="button button--ghost" href="{% url 'records:vaccine_add' pet.pk %}">Add vaccine</a>
+        <a class="button" href="{% url 'records:medication_add' pet.pk %}">Add medication</a>
+    </div>
+</section>
+
+<section class="metric-grid">
+    <article class="metric-card">
+        <p>Age</p>
+        <strong>{{ pet.age_display }}</strong>
+        <span>Based on date of birth</span>
+    </article>
+    <article class="metric-card">
+        <p>Weight</p>
+        <strong>{% if pet.weight_lbs %}{{ pet.weight_lbs }} lbs{% else %}N/A{% endif %}</strong>
+        <span>Most recently saved weight</span>
+    </article>
+    <article class="metric-card">
+        <p>Microchip</p>
+        <strong>{% if pet.microchip_id %}Saved{% else %}None{% endif %}</strong>
+        <span>{% if pet.microchip_id %}{{ pet.microchip_id }}{% else %}No chip ID recorded{% endif %}</span>
+    </article>
+    <article class="metric-card">
+        <p>Next vaccine</p>
+        <strong>{% if next_vaccine and next_vaccine.next_due %}{{ next_vaccine.next_due|date:"M j" }}{% else %}N/A{% endif %}</strong>
+        <span>{% if next_vaccine %}{{ next_vaccine.name }}{% else %}No vaccine due dates{% endif %}</span>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <div class="content-stack">
+        <article class="content-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Patient snapshot</p>
+                    <h2>Profile details</h2>
+                </div>
+            </div>
+            <div class="profile-grid">
+                <div>
+                    <h3>Owner</h3>
+                    <p>{{ pet.owner.full_name }}</p>
+                    <p class="muted-text">{{ pet.owner.email|default:"No email saved" }}</p>
+                    <p class="muted-text">{{ pet.owner.phone|default:"No phone saved" }}</p>
+                </div>
+                <div>
+                    <h3>Insurance</h3>
+                    <p>{{ pet.insurance_provider|default:"No provider saved" }}</p>
+                    <p class="muted-text">{{ pet.insurance_member_id|default:"No member ID saved" }}</p>
+                </div>
+                <div>
+                    <h3>Alerts</h3>
+                    <p>{{ pet.allergies|default:"No allergies recorded." }}</p>
+                </div>
+                <div>
+                    <h3>Chronic conditions</h3>
+                    <p>{{ pet.chronic_conditions|default:"No chronic conditions recorded." }}</p>
+                </div>
+                <div class="profile-grid__wide">
+                    <h3>Diet notes</h3>
+                    <p>{{ pet.diet_notes|default:"No diet notes recorded." }}</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="content-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">History</p>
+                    <h2>Vet visits</h2>
+                </div>
+                <a class="text-link" href="{% url 'records:visit_add' pet.pk %}">Add visit</a>
+            </div>
+
+            {% if visits %}
+            <div class="timeline">
+                {% for visit in visits %}
+                <article class="timeline-card">
+                    <div class="timeline-card__header">
+                        <div>
+                            <h3>{{ visit.get_visit_type_display }}</h3>
+                            <p>{{ visit.visited_on|date:"M j, Y" }}</p>
+                        </div>
+                        {% if visit.veterinarian %}
+                        <span class="list-tag">{{ visit.veterinarian }}</span>
+                        {% endif %}
+                    </div>
+                    {% if visit.clinic_name %}<p><strong>Clinic:</strong> {{ visit.clinic_name }}</p>{% endif %}
+                    {% if visit.reason_for_visit %}<p><strong>Reason:</strong> {{ visit.reason_for_visit }}</p>{% endif %}
+                    {% if visit.assessment %}<p><strong>Assessment:</strong> {{ visit.assessment }}</p>{% endif %}
+                    {% if visit.treatment_plan %}<p><strong>Plan:</strong> {{ visit.treatment_plan }}</p>{% endif %}
+                    {% if visit.follow_up_date %}<p><strong>Follow-up:</strong> {{ visit.follow_up_date|date:"M j, Y" }}</p>{% endif %}
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted-text">No visits have been logged for this pet yet.</p>
+            {% endif %}
+        </article>
+    </div>
+
+    <div class="content-stack">
+        <article class="content-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Immunizations</p>
+                    <h2>Vaccines</h2>
+                </div>
+                <a class="text-link" href="{% url 'records:vaccine_add' pet.pk %}">Add vaccine</a>
+            </div>
+
+            {% if vaccines %}
+            <div class="simple-list">
+                {% for vaccine in vaccines %}
+                <div class="simple-list__row simple-list__row--stacked">
+                    <div>
+                        <strong>{{ vaccine.name }}</strong>
+                        <p>
+                            {% if vaccine.date_administered %}
+                                Given {{ vaccine.date_administered|date:"M j, Y" }}
+                            {% else %}
+                                Administration date not recorded
+                            {% endif %}
+                        </p>
+                        {% if vaccine.provider %}<p>{{ vaccine.provider }}</p>{% endif %}
+                    </div>
+                    <div class="status-block">
+                        <span class="list-tag">{{ vaccine.due_status }}</span>
+                        <p>{% if vaccine.next_due %}Due {{ vaccine.next_due|date:"M j, Y" }}{% else %}No due date{% endif %}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted-text">No vaccine records have been added yet.</p>
+            {% endif %}
+        </article>
+
+        <article class="content-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Prescriptions</p>
+                    <h2>Medications</h2>
+                </div>
+                <a class="text-link" href="{% url 'records:medication_add' pet.pk %}">Add medication</a>
+            </div>
+
+            {% if medications %}
+            <div class="simple-list">
+                {% for medication in medications %}
+                <div class="simple-list__row simple-list__row--stacked">
+                    <div>
+                        <strong>{{ medication.name }}</strong>
+                        <p>
+                            {% if medication.dosage %}{{ medication.dosage }}{% else %}Dosage not recorded{% endif %}
+                            {% if medication.frequency %} &middot; {{ medication.frequency }}{% endif %}
+                        </p>
+                        {% if medication.instructions %}<p>{{ medication.instructions }}</p>{% endif %}
+                    </div>
+                    <div class="status-block">
+                        <span class="list-tag">{{ medication.status_label }}</span>
+                        <p>
+                            {% if medication.start_date %}Started {{ medication.start_date|date:"M j, Y" }}{% endif %}
+                            {% if medication.end_date %}<br>Ends {{ medication.end_date|date:"M j, Y" }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted-text">No medication records have been added yet.</p>
+            {% endif %}
+        </article>
+    </div>
+</section>
+{% endblock %}
