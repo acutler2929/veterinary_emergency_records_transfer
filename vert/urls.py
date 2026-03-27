@@ -7,5 +7,5 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("records.urls")),
+    path("", include("apps.records.urls")),
 ]

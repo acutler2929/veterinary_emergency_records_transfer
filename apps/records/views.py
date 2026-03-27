@@ -10,7 +10,7 @@ from .models import Medication, Pet, Vaccine, Visit
 
 
 class DashboardView(TemplateView):
-    template_name = "records/dashboard.html"
+    template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -50,7 +50,7 @@ class DashboardView(TemplateView):
 
 class OwnerCreateView(CreateView):
     form_class = OwnerForm
-    template_name = "records/form_page.html"
+    template_name = "form_page.html"
     success_url = reverse_lazy("records:dashboard")
 
     def get_context_data(self, **kwargs):
@@ -68,7 +68,7 @@ class OwnerCreateView(CreateView):
 
 class PetCreateView(CreateView):
     form_class = PetForm
-    template_name = "records/form_page.html"
+    template_name = "form_page.html"
     success_url = reverse_lazy("records:dashboard")
 
     def get_context_data(self, **kwargs):
@@ -86,7 +86,7 @@ class PetCreateView(CreateView):
 
 class PetDetailView(DetailView):
     model = Pet
-    template_name = "records/pet_detail.html"
+    template_name = "pet_detail.html"
     context_object_name = "pet"
 
     def get_queryset(self):
@@ -112,7 +112,7 @@ class PetDetailView(DetailView):
 
 class PetRelatedCreateMixin(CreateView):
     pet = None
-    template_name = "records/form_page.html"
+    template_name = "form_page.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.pet = get_object_or_404(Pet.objects.select_related("owner"), pk=kwargs["pk"])
