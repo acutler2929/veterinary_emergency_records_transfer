@@ -11,7 +11,7 @@ from .views import (
 )
 
 
-app_name = "records"
+app_name = "vert_core"
 
 urlpatterns = [
     path("", DashboardView.as_view(), name="dashboard"),

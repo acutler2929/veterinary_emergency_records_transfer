@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ('insurance_member_id', models.CharField(blank=True, max_length=100)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='pets', to='records.owner')),
+                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='pets', to='vert_core.owner')),
             ],
             options={
                 'ordering': ['name'],
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                 ('prescribing_vet', models.CharField(blank=True, max_length=100)),
                 ('instructions', models.TextField(blank=True)),
                 ('active', models.BooleanField(default=True)),
-                ('pet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='medications', to='records.pet')),
+                ('pet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='medications', to='vert_core.pet')),
             ],
             options={
                 'ordering': ['name'],
@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
                 ('provider', models.CharField(blank=True, max_length=100)),
                 ('lot_number', models.CharField(blank=True, max_length=80)),
                 ('notes', models.TextField(blank=True)),
-                ('pet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vaccines', to='records.pet')),
+                ('pet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vaccines', to='vert_core.pet')),
             ],
             options={
                 'ordering': ['next_due', 'name'],
@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
                 ('assessment', models.TextField(blank=True)),
                 ('treatment_plan', models.TextField(blank=True)),
                 ('follow_up_date', models.DateField(blank=True, null=True)),
-                ('pet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='visits', to='records.pet')),
+                ('pet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='visits', to='vert_core.pet')),
             ],
             options={
                 'ordering': ['-visited_on', '-id'],
