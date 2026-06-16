@@ -1,9 +1,9 @@
 from django.urls import path
 
 from .views import (
-    recipes,
-    update_recipe,
-    delete_recipe,
+    users,
+    update_user,
+    delete_user,
     # DashboardView,
     # MedicationCreateView,
     # OwnerCreateView,
@@ -18,9 +18,9 @@ app_name = "vert_core"
 
 urlpatterns = [
     # path("", DashboardView.as_view(), name="dashboard"),
-    path('', recipes),
-    path('update_recipe/<id>', update_recipe, name='update_recipe'),
-    path('delete_recipe/<id>', delete_recipe, name='delete_recipe'),
+    path('', users),
+    path('update_user/<id>', update_user, name='update_user'),
+    path('delete_user/<id>', delete_user, name='delete_user'),
     # path("owners/add/", OwnerCreateView.as_view(), name="owner_add"),
     # path("pets/add/", PetCreateView.as_view(), name="pet_add"),
     # path("pets/<int:pk>/", PetDetailView.as_view(), name="pet_detail"),

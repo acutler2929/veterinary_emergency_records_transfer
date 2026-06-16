@@ -1,19 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import date, timedelta
 
-class Recipe(models.Model):
+class User(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    recipe_name = models.CharField(max_length=100)
-    recipe_description = models.TextField()
-    recipe_image = models.ImageField(upload_to="recipe")
-    recipe_view_count = models.PositiveIntegerField(default=1)
+    user_name = models.CharField(max_length=100, default="No Name")
+    additional_notes = models.TextField()
+    pet_image = models.ImageField(upload_to="pets", default="pets/default.png")
 
     def __str__(self):
-        return self.recipe_name
-
-# from datetime import date, timedelta
-
-# from django.db import models
+        return self.user.username if self.user else "No User"
 
 
 # class Owner(models.Model):

@@ -1,50 +1,50 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Recipe
+from .models import User
 
-def recipes(request):
+def users(request):
     if request.method == 'POST':
         data = request.POST
-        recipe_image = request.FILES.get('recipe_image')
-        recipe_name = data.get('recipe_name')
-        recipe_description = data.get('recipe_description')
+        pet_image = request.FILES.get('pet_image')
+        user_name = data.get('user_name')
+        additional_notes = data.get('additional_notes')
 
-        Recipe.objects.create(
-            recipe_image=recipe_image,
-            recipe_name=recipe_name,
-            recipe_description=recipe_description,
+        User.objects.create(
+            pet_image=pet_image,
+            user_name=user_name,
+            additional_notes=additional_notes,
         )
         return redirect('/')
 
-    queryset = Recipe.objects.all()
+    queryset = User.objects.all()
     if request.GET.get('search'):
-        queryset = queryset.filter(recipe_name__icontains=request.GET.get('search'))
+        queryset = queryset.filter(user_name__icontains=request.GET.get('search'))
 
-    context = {'recipes': queryset}
+    context = {'users': queryset}
     return render(request, 'dashboard.html', context)
 
 
-def delete_recipe(request, id):
-    recipe = get_object_or_404(Recipe, id=id)
-    recipe.delete()
+def delete_user(request, id):
+    user = get_object_or_404(User, id=id)
+    user.delete()
     return redirect('/')
 
 
-def update_recipe(request, id):
-    recipe = get_object_or_404(Recipe, id=id)
+def update_user(request, id):
+    user = get_object_or_404(User, id=id)
     if request.method == 'POST':
         data = request.POST
-        recipe_name = data.get('recipe_name')
-        recipe_description = data.get('recipe_description')
-        recipe_image = request.FILES.get('recipe_image')
+        user_name = data.get('user_name')
+        additional_notes = data.get('additional_notes')
+        pet_image = request.FILES.get('pet_image')
 
-        recipe.recipe_name = recipe_name
-        recipe.recipe_description = recipe_description
-        if recipe_image:
-            recipe.recipe_image = recipe_image
-        recipe.save()
+        user.user_name = user_name
+        user.additional_notes = additional_notes
+        if pet_image:
+            user.pet_image = pet_image
+        user.save()
         return redirect('/')
 
-    context = {'recipe': recipe}
+    context = {'user': user}
     return render(request, 'form_page.html', context)
 
 # from datetime import timedelta
