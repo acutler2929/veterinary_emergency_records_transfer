@@ -5,6 +5,12 @@ from datetime import date, timedelta
 class User(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     user_name = models.CharField(max_length=100, default="No Name")
+    user_permissions = models.CharField(max_length=100, blank=True)   # TODO: (e.g. "pet owner", "medical provider", "admin") - implement into views and templates
+    first_name = models.CharField(max_length=100, blank=True)   # TODO: implement into views and templates
+    last_name = models.CharField(max_length=100, blank=True)    # TODO: implement into views and templates
+    title = models.CharField(max_length=100, blank=True)        # TODO: implement into views and templates (e.g. "Dr.", "Mr.", "Ms.")
+    email = models.EmailField(blank=True)                       # TODO: implement into views and templates
+    phone = models.CharField(max_length=30, blank=True)         # TODO: implement into views and templates
     additional_notes = models.TextField()
     pet_image = models.ImageField(upload_to="pets", default="pets/default.png")
 
@@ -12,25 +18,29 @@ class User(models.Model):
         return self.user.username if self.user else "No User"
 
 
-# class Owner(models.Model):
-#     first_name = models.CharField(max_length=100)
-#     last_name = models.CharField(max_length=100)
-#     email = models.EmailField(blank=True)
-#     phone = models.CharField(max_length=30, blank=True)
-#     address = models.TextField(blank=True)
-#     emergency_contact_name = models.CharField(max_length=150, blank=True)
-#     emergency_contact_phone = models.CharField(max_length=30, blank=True)
-#     notes = models.TextField(blank=True)
+class PetOwner(models.Model):                                   # TODO: implement into views and templates
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    home_address = models.TextField(blank=True)
+    emergency_contact_name = models.CharField(max_length=150, blank=True)
+    emergency_contact_phone = models.CharField(max_length=30, blank=True)
 
-#     class Meta:
-#         ordering = ["last_name", "first_name"]
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}".strip()
 
-#     @property
-#     def full_name(self) -> str:
-#         return f"{self.first_name} {self.last_name}".strip()
+    def __str__(self) -> str:
+        return self.full_name or "Owner"
+    
 
-#     def __str__(self) -> str:
-#         return self.full_name or "Owner"
+class MedicalProvider(models.Model):                                  # TODO: implement into views and templates
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    medical_role = models.CharField(max_length=100, blank=True)         # TODO: (e.g. "nurse", "vet tech", "veterinarian")
+    veterinarian_name = models.CharField(max_length=150, blank=True)
+    clinic_name = models.CharField(max_length=150, blank=True)
+    clinic_address = models.TextField(blank=True)
+
+    def __str__(self) -> str:
+        return self.clinic_name or self.veterinarian_name or "Medical Provider"
 
 
 # class Pet(models.Model):
