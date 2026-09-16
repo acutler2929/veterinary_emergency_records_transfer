@@ -10,6 +10,15 @@
 </style>
  
 <div class="container mt-5">
+
+    <div class="col-6 mx-auto card p-3 shadow-lg">
+        <p>Please choose an option:</p>
+<ul>
+  <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+  <li><a href="{% url 'account_login' %}">Log In</a></li>
+  <li><a href="{% url 'account_reset_password' %}">Reset Password</a></li>
+</ul>
+    </div>
     
     <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
         {% csrf_token %}
