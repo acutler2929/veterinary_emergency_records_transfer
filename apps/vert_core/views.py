@@ -1,6 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User
 
+@login_required
 def users(request):
     if request.method == 'POST':
         data = request.POST
@@ -23,12 +25,14 @@ def users(request):
     return render(request, 'dashboard.html', context)
 
 
+@login_required
 def delete_user(request, id):
     user = get_object_or_404(User, id=id)
     user.delete()
     return redirect('/')
 
 
+@login_required
 def update_user(request, id):
     user = get_object_or_404(User, id=id)
     if request.method == 'POST':
