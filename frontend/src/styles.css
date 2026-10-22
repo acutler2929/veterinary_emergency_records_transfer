@@ -143,13 +143,10 @@ small {
   margin-top: 1px;
 }
 .brand-symbol {
-  display: grid;
-  place-items: center;
   width: 43px;
-  height: 45px;
-  background: var(--teal);
-  border-radius: 12px 12px 12px 3px;
-  color: white;
+  height: 43px;
+  flex-shrink: 0;
+  border: 2px solid var(--teal);
 }
 .nav-caption {
   font-size: 9px;

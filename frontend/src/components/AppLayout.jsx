@@ -45,9 +45,7 @@ export default function AppLayout({ preview = false }) {
       <div className="app-shell">
         <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
           <Link to={`${prefix}/`} className="brand">
-            <span className="brand-symbol">
-              <Icon name="pets" size={25} />
-            </span>
+            <span className="brand-symbol" aria-hidden="true" />
             <span>
               VERT<small>Veterinary records</small>
             </span>

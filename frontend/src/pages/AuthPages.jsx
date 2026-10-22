@@ -10,9 +10,7 @@ function AuthLayout({ title, description, children }) {
     <div className="auth-shell">
       <section className="auth-story">
         <Link className="brand" to="/login">
-          <span className="brand-symbol">
-            <Icon name="pets" size={28} />
-          </span>
+          <span className="brand-symbol" aria-hidden="true" />
           <span>
             VERT<small>Veterinary records</small>
           </span>
@@ -66,7 +64,7 @@ export function Login() {
   const fields = [
     {
       name: 'login',
-      label: auth.loginLabel,
+      label: 'Username',
       required: true,
       autoComplete: 'username',
     },
@@ -110,7 +108,7 @@ export function Login() {
         <div ref={summary} tabIndex={-1}>
           {Object.keys(errors).length > 0 && (
             <p role="alert" className="field-error">
-              Enter your account identifier and password.
+              Enter your username and password.
             </p>
           )}
         </div>

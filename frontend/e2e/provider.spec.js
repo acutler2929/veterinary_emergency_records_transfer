@@ -18,7 +18,7 @@ test('login validates input and protects clinical routes', async ({ page }) => {
   await expect(page).toHaveURL(/\/login$/);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(
-    page.getByText('Enter your account identifier and password.'),
+    page.getByText('Enter your username and password.'),
   ).toBeVisible();
   await page.screenshot({
     path: 'test-results/login-desktop.png',
