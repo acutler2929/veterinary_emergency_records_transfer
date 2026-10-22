@@ -21,3 +21,9 @@ node_modules/
 *.css
 *.css.map
 package-lock.json
+
+# Keep authored frontend styles and reproducible dependency locks.
+!frontend/src/**/*.css
+.backend-test/
+__pycache__/
+*.py[cod]
