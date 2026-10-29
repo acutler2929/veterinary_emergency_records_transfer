@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User
+from .roles import get_role
 
 @login_required
 def users(request):
@@ -11,30 +12,32 @@ def users(request):
         additional_notes = data.get('additional_notes')
 
         User.objects.create(
+            user=request.user,
             pet_image=pet_image,
             user_name=user_name,
             additional_notes=additional_notes,
         )
         return redirect('/')
 
-    queryset = User.objects.all()
+    role = get_role(request)
+    queryset = role.visible_records(request)
     if request.GET.get('search'):
         queryset = queryset.filter(user_name__icontains=request.GET.get('search'))
 
     context = {'users': queryset}
-    return render(request, 'dashboard.html', context)
+    return render(request, role.template_name, context)
 
 
 @login_required
 def delete_user(request, id):
-    user = get_object_or_404(User, id=id)
+    user = get_object_or_404(get_role(request).visible_records(request), id=id)
     user.delete()
     return redirect('/')
 
 
 @login_required
 def update_user(request, id):
-    user = get_object_or_404(User, id=id)
+    user = get_object_or_404(get_role(request).visible_records(request), id=id)
     if request.method == 'POST':
         data = request.POST
         user_name = data.get('user_name')
