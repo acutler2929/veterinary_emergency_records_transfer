@@ -48,6 +48,15 @@ Every contract below is a **frontend expectation for team review**, not an exist
 | AuditHistory / `audit()` | Read-only events with ID, actor, action, target, timestamp; `audit_read` permission | None | Frontend completed, backend pending. Implement immutable server logging for protected access/create/update/archive, plus authorized admin review. Normal users cannot edit or fetch history through this interface. |
 | FR 15 backups | Scheduled consistent backups and tested restoration of all linked records | None | Backend/infrastructure responsibility. Define schedule/RPO/RTO, retention and restoration runbook; test a restore. There is no frontend backup button. |
 
+## Owner and pet identification, adoption, and photographs (Gage and Alice)
+
+- These are proposed frontend fields, awaiting an approved backend contract. Owner profiles need independent unique `id`, separate `first_name` and `last_name`, and optional `phone`, `email`, address and emergency contact fields. The owner form sends the separate names. Legacy `name` / `owner_name` values remain display fallbacks and are never split to guess names.
+- Keep one owner to many pets through `pet.owner_id`. Owner detail includes associated `pets`. Pet lists/details and dashboard lookup need authorized owner identity/contact data: `owner_first_name`, `owner_last_name`, `owner_phone` (or an `owner` object with those owner fields); the dashboard can also join its loaded `owners` by ID. Owner labels use “Last, First, Phone”; pet labels use “Owner last, Pet, Owner phone”. These labels never replace IDs, even when two owners share the same name and phone. Relationship options must provide the same identification fields. Server search should cover owner/pet names and phones with authorization and pagination.
+- Pet payloads include `adopted: boolean`. The checkbox is shown only for dogs (case-insensitive species comparison), and non-dogs normalize to `false`. Existing missing/null adoption values display as “Not recorded”, never a confirmed “No”. Agree how unknown historical adoption is represented before live edits; do not migrate missing values to confirmed negatives. New/edit form checkbox state is boolean and defaults unchecked.
+- Pet detail expects an optional authorized same-origin root-relative `photo_url`; missing, unsafe or failed images use the existing pet placeholder. The optional photograph input only selects a local file for form review; it does not upload. Add secure pet image storage, upload permissions/type/size checks and multipart handling at the service boundary before enabling uploads. Do not reuse the unrelated custom User `pet_image` field or JSON-serialize a File.
+
+No model or migration was added for these UI changes. `integrated.owners` and `integrated.pets` remain false, all live record operations stay pending, and the separate fictional preview remains read-only.
+
 ## Contract details and connection steps
 
 1. Agree resource fields, IDs, status enums, permission names and clinical recording states. Adapt at the service boundary if database names differ from frontend names.

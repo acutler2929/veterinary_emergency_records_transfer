@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useWorkspace } from '../context/WorkspaceContext';
 import useResource from '../hooks/useResource';
+import { lookupText, ownerLabel, petLabel, petOwner } from '../utils/labels';
 import {
   Card,
   DateValue,
@@ -21,14 +22,18 @@ export default function Dashboard() {
   const data = resource.data;
   const patients = data?.patients || [];
   const matches = patients.filter((pet) =>
-    `${pet.name} ${pet.owner_name} ${pet.microchip_id || ''}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
+    lookupText(pet, petOwner(pet, data?.owners)).includes(
+      query.trim().toLowerCase(),
+    ),
   );
   const owners = (data?.owners || []).filter((owner) =>
-    `${owner.name} ${owner.email || ''} ${owner.phone || ''}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
+    lookupText({
+      ...owner,
+      pets: [
+        ...(owner.pets || []),
+        ...patients.filter((pet) => String(pet.owner_id) === String(owner.id)),
+      ],
+    }).includes(query.trim().toLowerCase()),
   );
   return (
     <>
@@ -57,7 +62,7 @@ export default function Dashboard() {
         </div>
         <div className="banner-art" aria-hidden="true">
           <span>
-            <Icon name="pets" size={64} />
+            <Icon name="dogRecord" size={64} />
           </span>
           <i className="art-cross">+</i>
         </div>
@@ -100,7 +105,7 @@ export default function Dashboard() {
             <Search
               value={query}
               onChange={setQuery}
-              label="Search loaded pets, owners, or microchip IDs"
+              label="Search loaded pets, owners, phone numbers, or microchip IDs"
             />
             {!data ? (
               <EmptyState title="Your patients will appear here">
@@ -122,12 +127,11 @@ export default function Dashboard() {
                       <Icon name="pets" size={23} />
                     </span>
                     <div>
-                      <strong>{pet.name}</strong>
+                      <strong>{petLabel(pet, petOwner(pet, data?.owners))}</strong>
                       <p>
                         {pet.species} · {pet.breed || 'Breed not recorded'}
                       </p>
                     </div>
-                    <span className="row-owner">{pet.owner_name}</span>
                     <Icon name="arrow" size={16} />
                   </RecordLink>
                 ))}
@@ -140,7 +144,7 @@ export default function Dashboard() {
                     >
                       <Icon name="owners" />
                       <div>
-                        <strong>{owner.name}</strong>
+                        <strong>{ownerLabel(owner)}</strong>
                         <p>
                           Owner profile · {owner.email || 'Email not recorded'}
                         </p>
@@ -164,7 +168,7 @@ export default function Dashboard() {
                     key={pet.id}
                     className="list-row"
                   >
-                    <strong>{pet.name}</strong>
+                    <strong>{petLabel(pet, petOwner(pet, data?.owners))}</strong>
                     <span>
                       Review record <Icon name="arrow" size={16} />
                     </span>

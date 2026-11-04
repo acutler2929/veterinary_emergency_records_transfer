@@ -5,14 +5,8 @@ import { WorkspaceContext } from '../context/WorkspaceContext';
 import { recordsApi } from '../services/api';
 import { sampleApi } from '../preview/sampleData';
 import { Icon, Notice } from './ui';
-
-const navigation = [
-  ['/', 'dashboard', 'Dashboard'],
-  ['/owners', 'owners', 'Pet owners'],
-  ['/pets', 'pets', 'Pet records'],
-  ['/visits', 'visits', 'Visits'],
-  ['/clinics', 'clinics', 'Veterinary clinics'],
-];
+import Brand from './Brand';
+import Navigation from './Navigation';
 
 export default function AppLayout({ preview = false }) {
   const auth = useAuth();
@@ -22,6 +16,11 @@ export default function AppLayout({ preview = false }) {
   const location = useLocation();
   const main = useRef(null);
   const prefix = preview ? '/preview' : '';
+  const navigationKey = preview
+    ? 'vert:navigation:preview'
+    : auth?.user?.id != null
+      ? `vert:navigation:user:${auth.user.id}`
+      : null;
   useEffect(() => {
     main.current?.focus({ preventScroll: true });
   }, [location.pathname]);
@@ -44,26 +43,14 @@ export default function AppLayout({ preview = false }) {
       </a>
       <div className="app-shell">
         <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
-          <Link to={`${prefix}/`} className="brand">
-            <span className="brand-symbol" aria-hidden="true" />
-            <span>
-              VERT<small>Veterinary records</small>
-            </span>
-          </Link>
+          <Brand to={`${prefix}/`} />
           <p className="nav-caption">WORKSPACE</p>
-          <nav aria-label="Main navigation">
-            {navigation.map(([to, icon, label]) => (
-              <NavLink
-                key={to}
-                to={`${prefix}${to}`}
-                end={to === '/'}
-                onClick={() => setMenuOpen(false)}
-              >
-                <Icon name={icon} />
-                {label}
-              </NavLink>
-            ))}
-          </nav>
+          <Navigation
+            key={navigationKey}
+            prefix={prefix}
+            storageKey={navigationKey}
+            onNavigate={() => setMenuOpen(false)}
+          />
           <div className="sidebar-bottom">
             <div className="security-note">
               <Icon name="shield" />

@@ -6,6 +6,9 @@ const paths = {
   owners:
     'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
   pets: 'M12 21c-6 0-8-5-4-8l4-3 4 3c4 3 2 8-4 8M5 8a2 3 0 1 0 0-6 2 3 0 0 0 0 6M19 8a2 3 0 1 0 0-6 2 3 0 0 0 0 6M9 7V4M15 7V4',
+  paw: 'M9 8a2 2.75 0 1 0 0-5.5 2 2.75 0 1 0 0 5.5ZM15 8a2 2.75 0 1 0 0-5.5 2 2.75 0 1 0 0 5.5ZM4.5 12a1.75 2.5 0 1 0 0-5 1.75 2.5 0 1 0 0 5ZM19.5 12a1.75 2.5 0 1 0 0-5 1.75 2.5 0 1 0 0 5ZM12 11c-2 0-3 3-5 5-2 2-1 5 1 5 1.5 0 2.5-1 4-1s2.5 1 4 1c2 0 3-3 1-5-2-2-3-5-5-5Z',
+  dogRecord:
+    'M7 6c1-3.5 9-3.5 10 0M7 6C6 3.5 4 4 3 6l-1.5 4c-.5 2 2 3 3.5 1.5L7 7M17 6c1-2.5 3-2 4 0l1.5 4c.5 2-2 3-3.5 1.5L17 7M6.5 9v2c0 1.5.5 2.5 1.5 3.5M17.5 9v2c0 1.5-.5 2.5-1.5 3.5M9 8.5h.01M15 8.5h.01M11 11h2l-1 1.5-1-1.5ZM12 12.5v2M8 14.5h6l2 2V22H8v-7.5ZM14 14.5v2h2M10.5 18.5h3M10.5 20h3',
   visits:
     'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2',
   clinics: 'M4 22V4h16v18M9 22v-6h6v6M9 8h6M12 5v6',
@@ -119,13 +122,16 @@ export function Field({ field, value, error, onChange, options = [] }) {
     id: name,
     name,
     required,
-    value: value ?? '',
-    onChange: (event) => onChange(name, event.target.value),
+    ...(type === 'checkbox'
+      ? { checked: value === true }
+      : { value: value ?? '' }),
+    onChange: (event) =>
+      onChange(name, type === 'checkbox' ? event.target.checked : event.target.value),
     'aria-invalid': Boolean(error),
     'aria-describedby': `${name}-help${error ? ` ${name}-error` : ''}`,
   };
   return (
-    <div className={`field ${field.wide ? 'wide' : ''}`}>
+    <div className={`field ${field.wide ? 'wide' : ''} ${type === 'checkbox' ? 'checkbox-field' : ''}`}>
       <label htmlFor={name}>
         {label}
         {required && <span aria-hidden="true"> *</span>}
@@ -170,6 +176,7 @@ export function Field({ field, value, error, onChange, options = [] }) {
           min={field.min}
           max={field.max}
           step={field.step}
+          disabled={field.disabled}
         />
       )}
       <small id={`${name}-help`}>

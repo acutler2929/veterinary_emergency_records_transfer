@@ -30,11 +30,12 @@ describe('future integration confirmation boundary with test-only service double
     const user = userEvent.setup();
     const saveOwner = vi.fn().mockResolvedValue({ id: 42 });
     setup({ saveOwner });
-    await user.type(screen.getByLabelText(/Owner name/), 'Jamie');
+    await user.type(screen.getByLabelText(/First name/), 'Jamie');
+    await user.type(screen.getByLabelText(/Last name/), 'Smith');
     await user.click(screen.getByRole('button', { name: 'Save record' }));
     expect(await screen.findByText('Saved owner detail')).toBeInTheDocument();
     expect(saveOwner).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Jamie', email: null }),
+      expect.objectContaining({ first_name: 'Jamie', last_name: 'Smith', email: null }),
       undefined,
     );
   });
@@ -43,18 +44,20 @@ describe('future integration confirmation boundary with test-only service double
     const error = new Error('Validation failed');
     error.errors = { email: ['Email could not be accepted.'] };
     setup({ saveOwner: vi.fn().mockRejectedValue(error) });
-    await user.type(screen.getByLabelText(/Owner name/), 'Jamie');
+    await user.type(screen.getByLabelText(/First name/), 'Jamie');
+    await user.type(screen.getByLabelText(/Last name/), 'Smith');
     await user.click(screen.getByRole('button', { name: 'Save record' }));
     expect(
       await screen.findByText('Email could not be accepted.'),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/Owner name/)).toHaveValue('Jamie');
+    expect(screen.getByLabelText(/First name/)).toHaveValue('Jamie');
     expect(screen.queryByText('Saved owner detail')).not.toBeInTheDocument();
   });
   it('rejects an unconfirmed response', async () => {
     const user = userEvent.setup();
     setup({ saveOwner: vi.fn().mockResolvedValue({}) });
-    await user.type(screen.getByLabelText(/Owner name/), 'Jamie');
+    await user.type(screen.getByLabelText(/First name/), 'Jamie');
+    await user.type(screen.getByLabelText(/Last name/), 'Smith');
     await user.click(screen.getByRole('button', { name: 'Save record' }));
     expect(
       await screen.findByText(/No save was confirmed/),

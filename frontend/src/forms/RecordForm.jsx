@@ -14,23 +14,32 @@ import {
 } from '../components/ui';
 import { formDefinitions } from './fields';
 import { normalizeValues, validate } from '../utils/validation';
+import { ownerLabel, petLabel } from '../utils/labels';
 
 const noRecord = async () => null;
 const noOptions = async () => ({});
 
-function initialValues(definition, query) {
+export function initialValues(definition, query) {
   const values = {};
   for (const field of definition.fields)
-    values[field.name] = field.defaultValue || '';
+    values[field.name] = field.type === 'checkbox'
+      ? field.defaultValue === true
+      : field.defaultValue ?? '';
   for (const name of ['owner_id', 'pet_id', 'visit_id']) {
     if (query.get(name) && name in values) values[name] = query.get(name);
   }
   return values;
 }
-function editValues(data, fields) {
+export function editValues(data, fields) {
   const values = {};
   for (const field of fields)
-    values[field.name] = data[field.name] ?? field.defaultValue ?? '';
+    values[field.name] = field.type === 'checkbox'
+      ? data[field.name] === true
+      : data[field.name] ?? field.defaultValue ?? '';
+  for (const field of fields) {
+    if (field.type === 'checkbox' && field.when && !field.when(values))
+      values[field.name] = false;
+  }
   for (const key of ['allergies', 'chronic_conditions', 'procedures']) {
     if (data.critical?.[key]) {
       values[`${key}_state`] = data.critical[key].state;
@@ -82,8 +91,26 @@ export default function RecordForm({ kind, publicForm = false }) {
     (!id || Boolean(resource.data)) &&
     !options.loading &&
     !options.error;
+  const visibleFields = definition.fields.filter(
+    (field) => !field.when || field.when(values),
+  );
+  function fieldOptions(field) {
+    const choices = field.options || options.data?.[field.source] || [];
+    return choices.map((item) => {
+      if (field.source === 'owners') return { ...item, label: ownerLabel(item) };
+      if (field.source === 'pets') return { ...item, label: petLabel(item) };
+      return item;
+    });
+  }
   function update(name, value) {
-    setValues((current) => ({ ...current, [name]: value }));
+    setValues((current) => {
+      const next = { ...current, [name]: value };
+      for (const field of definition.fields) {
+        if (field.type === 'checkbox' && field.when && !field.when(next))
+          next[field.name] = false;
+      }
+      return next;
+    });
     setErrors((current) => ({ ...current, [name]: '' }));
     setMessage('');
     setValid(false);
@@ -180,6 +207,13 @@ export default function RecordForm({ kind, publicForm = false }) {
           do not receive accounts in this MVP.
         </p>
       )}
+      {kind === 'owner' && resource.data?.name &&
+        !resource.data.first_name && !resource.data.last_name && (
+          <Notice>
+            Existing owner name: {resource.data.name}. Enter first and last
+            names separately; the existing full name has not been split.
+          </Notice>
+        )}
       {kind === 'reset' && (
         <Notice danger>
           {query.get('token')
@@ -222,7 +256,7 @@ export default function RecordForm({ kind, publicForm = false }) {
             </p>
           )}
           <div className="form-grid">
-            {definition.fields.map((field) => (
+            {visibleFields.map((field) => (
               <Field
                 key={field.name}
                 field={{
@@ -233,7 +267,7 @@ export default function RecordForm({ kind, publicForm = false }) {
                 value={values[field.name]}
                 error={errors[field.name]}
                 onChange={update}
-                options={field.options || options.data?.[field.source] || []}
+                options={fieldOptions(field)}
               />
             ))}
           </div>

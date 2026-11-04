@@ -1,3 +1,5 @@
+import { isDog } from '../utils/validation';
+
 const field = (name, label, type = 'text', required = false, extra = {}) => ({
   name,
   label,
@@ -33,7 +35,8 @@ export const formDefinitions = {
     saver: 'saveOwner',
     detailPath: '/owners/',
     fields: [
-      field('name', 'Owner name', 'text', true),
+      field('first_name', 'First name', 'text', true),
+      field('last_name', 'Last name', 'text', true),
       field('email', 'Email', 'email'),
       field('phone', 'Phone', 'tel'),
       notes('address', 'Address'),
@@ -52,6 +55,10 @@ export const formDefinitions = {
       relationship('owner_id', 'Owner', 'owners'),
       field('name', 'Pet name', 'text', true),
       relationship('species', 'Species', 'species'),
+      field('adopted', 'Adopted', 'checkbox', false, {
+        defaultValue: false,
+        when: (values) => isDog(values.species),
+      }),
       field('breed', 'Breed'),
       field('date_of_birth', 'Date of birth', 'date'),
       field('age', 'Age when date of birth is unknown', 'text', false, {
@@ -65,7 +72,7 @@ export const formDefinitions = {
       field('color_markings', 'Color / markings'),
       field('microchip_id', 'Microchip ID'),
       field('photo', 'Pet photograph', 'file', false, {
-        hint: 'Optional JPEG, PNG, or WebP. Upload integration is pending.',
+        hint: 'Choose an optional JPEG, PNG, or WebP for form review only. No image is uploaded or saved; backend integration is pending.',
       }),
       notes('notes', 'Medical notes'),
       ...findings('allergies', 'Allergies'),

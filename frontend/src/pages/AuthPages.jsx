@@ -4,28 +4,18 @@ import { useAuth } from '../context/AuthContext';
 import { Field, Icon, Notice } from '../components/ui';
 import RecordForm from '../forms/RecordForm';
 import { validate } from '../utils/validation';
+import Brand from '../components/Brand';
+
+const slogan = 'Immediate remote access so your team can focus on the care ahead.';
 
 function AuthLayout({ title, description, children }) {
   return (
     <div className="auth-shell">
       <section className="auth-story">
-        <Link className="brand" to="/login">
-          <span className="brand-symbol" aria-hidden="true" />
-          <span>
-            VERT<small>Veterinary records</small>
-          </span>
-        </Link>
+        <Brand to="/login" />
         <div className="auth-story-content">
           <p className="eyebrow">CONNECTED CARE STARTS HERE</p>
-          <h1>
-            The right record.
-            <br />
-            At the right moment.
-          </h1>
-          <p>
-            A clearer view of every patient’s history, so your team can focus on
-            the care ahead.
-          </p>
+          <h1>{slogan}</h1>
           <div className="auth-feature">
             <Icon name="shield" />
             <div>

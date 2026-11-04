@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useWorkspace } from '../context/WorkspaceContext';
 import useResource from '../hooks/useResource';
+import { lookupText, ownerLabel, petLabel, petOwner } from '../utils/labels';
 import {
   Card,
   DateValue,
@@ -52,26 +53,14 @@ export default function Directory({ kind }) {
   const resource = useResource(api[kind]);
   const [query, setQuery] = useState('');
   const rows = (resource.data || []).filter((item) =>
-    [
-      item.name,
-      item.pet_name,
-      item.owner_name,
-      item.email,
-      item.phone,
-      item.id,
-      item.microchip_id,
-      item.address,
-    ]
-      .join(' ')
-      .toLowerCase()
-      .includes(query.toLowerCase()),
+    lookupText(item).includes(query.trim().toLowerCase()),
   );
   function cells(item) {
     if (kind === 'owners')
       return (
         <>
           <td>
-            <strong>{item.name}</strong>
+            <strong>{ownerLabel(item)}</strong>
           </td>
           <td>
             <div>
@@ -88,10 +77,10 @@ export default function Directory({ kind }) {
       return (
         <>
           <td>
-            <strong>{item.name}</strong>
+            <strong>{petLabel(item)}</strong>
           </td>
           <td>
-            <Value>{item.owner_name}</Value>
+            {ownerLabel(petOwner(item))}
           </td>
           <td>
             <Value>{item.species}</Value>
@@ -178,7 +167,9 @@ export default function Directory({ kind }) {
                       >
                         View{' '}
                         <span className="sr-only">
-                          {item.name || item.pet_name}
+                          {kind === 'owners' ? ownerLabel(item)
+                            : kind === 'pets' ? petLabel(item)
+                              : item.name || item.pet_name}
                         </span>
                         <Icon name="arrow" size={16} />
                       </RecordLink>

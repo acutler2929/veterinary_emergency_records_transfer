@@ -1,7 +1,19 @@
+export function isDog(species) {
+  return typeof species === 'string' && species.trim().toLowerCase() === 'dog';
+}
+
 export function validate(fields, values) {
   const errors = {};
   for (const field of fields) {
+    if (field.when && !field.when(values)) continue;
     const value = values[field.name];
+    if (field.type === 'checkbox') {
+      if (field.required && value !== true)
+        errors[field.name] = `${field.label} is required.`;
+      else if (value !== undefined && value !== null && typeof value !== 'boolean')
+        errors[field.name] = 'Choose a checkbox value.';
+      continue;
+    }
     const text = typeof value === 'string' ? value.trim() : value;
     if (
       field.required &&
@@ -50,6 +62,10 @@ export function normalizeValues(values, fields) {
   const result = {};
   for (const field of fields) {
     let value = values[field.name];
+    if (field.type === 'checkbox') {
+      result[field.name] = (!field.when || field.when(values)) && value === true;
+      continue;
+    }
     if (typeof value === 'string' && field.type !== 'password')
       value = value.trim();
     if (value === '' || value === undefined) value = null;

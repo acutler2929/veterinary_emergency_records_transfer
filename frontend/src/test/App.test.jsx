@@ -29,7 +29,7 @@ describe('provider navigation and integration states', () => {
   it('keeps supplied active medications prominent even if the finding flag is missing', async () => {
     vi.spyOn(recordsApi, 'pet').mockResolvedValue({ id: 42, name: 'Test patient', medications: [{ id: 12, name: 'Recorded medicine', active: true }] });
     renderApp('/pets/42');
-    await screen.findByRole('heading', { name: 'Test patient', level: 1 });
+    await screen.findByRole('heading', { name: /Test patient/, level: 1 });
     const critical = screen.getByRole('heading', { name: 'Active medications' }).parentElement;
     expect(within(critical).getByText('Recorded medicine')).toBeInTheDocument();
     expect(within(critical).queryByText('Not recorded')).not.toBeInTheDocument();
@@ -75,13 +75,14 @@ describe('provider navigation and integration states', () => {
   it('keeps form input on failure and disables unsaved backend actions', async () => {
     const user = userEvent.setup();
     renderApp('/owners/new');
-    await user.type(screen.getByLabelText(/Owner name/), 'Jamie');
+    await user.type(screen.getByLabelText(/First name/), 'Jamie');
+    await user.type(screen.getByLabelText(/Last name/), 'Smith');
     await user.type(screen.getByLabelText(/^Email/), 'broken');
     await user.click(screen.getByRole('button', { name: 'Check form' }));
     expect(
       await screen.findByText('Enter a valid email address.'),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/Owner name/)).toHaveValue('Jamie');
+    expect(screen.getByLabelText(/First name/)).toHaveValue('Jamie');
     expect(screen.getByRole('button', { name: 'Save record' })).toBeDisabled();
     expect(
       screen.queryByText(/confirmed this record was saved/),
@@ -109,7 +110,7 @@ describe('provider navigation and integration states', () => {
   it('navigates owner → pet → visit → medication in the separate sample preview', async () => {
     const user = userEvent.setup();
     renderApp('/preview/owners/sample-owner', { user: null });
-    await user.click(await screen.findByRole('link', { name: /Mochi Dog/ }));
+    await user.click(await screen.findByRole('link', { name: /Morgan, Mochi, 555-0104 Dog/ }));
     await user.click(
       await screen.findByRole('link', { name: /Sample scheduled.*Oct/ }),
     );
@@ -126,7 +127,7 @@ describe('provider navigation and integration states', () => {
     const user = userEvent.setup();
     renderApp('/preview/owners', { user: null });
     expect(
-      await screen.findByRole('link', { name: 'View Alex Morgan' }),
+      await screen.findByRole('link', { name: 'View Morgan, Alex, 555-0104' }),
     ).toBeInTheDocument();
     await user.type(screen.getByRole('searchbox'), 'missing');
     expect(screen.getByText('No matching records')).toBeInTheDocument();

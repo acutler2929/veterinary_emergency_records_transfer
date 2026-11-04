@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import { ownerLabel, petLabel, petOwner } from '../utils/labels';
+import { isDog } from '../utils/validation';
 import { useWorkspace } from '../context/WorkspaceContext';
 import useResource from '../hooks/useResource';
 import {
@@ -41,7 +44,7 @@ export function OwnerDetail() {
   return (
     <>
       <PageHeading
-        title={owner?.name || 'Owner profile'}
+        title={owner ? ownerLabel(owner) : 'Owner profile'}
         description={`Owner ID: ${id}`}
       >
         <RecordLink className="button secondary" to={`/owners/${id}/edit`}>
@@ -81,7 +84,7 @@ export function OwnerDetail() {
                   <Icon name="pets" />
                 </span>
                 <div>
-                  <strong>{pet.name}</strong>
+                  <strong>{petLabel(pet, owner)}</strong>
                   <p>
                     {pet.species} · {pet.breed || 'Breed not recorded'}
                   </p>
@@ -156,6 +159,15 @@ export function PetDetail() {
   const { api } = useWorkspace();
   const resource = useResource(api.pet, id);
   const pet = resource.data;
+  const [failedPhoto, setFailedPhoto] = useState(null);
+  // Keep media same-origin and reject protocol-relative or backslash URLs.
+  const photoUrl =
+    typeof pet?.photo_url === 'string' &&
+    pet.photo_url.startsWith('/') &&
+    !pet.photo_url.startsWith('//') &&
+    !/[\\\s]/.test(pet.photo_url)
+      ? pet.photo_url
+      : null;
   const activeMedications =
     pet?.medications?.filter((item) => item.active === true) || [];
   const medicationFinding = activeMedications.length
@@ -165,7 +177,7 @@ export function PetDetail() {
     <>
       <PageHeading
         eyebrow="Patient medical record"
-        title={pet?.name || 'Pet medical record'}
+        title={pet ? petLabel(pet) : 'Pet medical record'}
         description={`Patient ID: ${id}`}
       >
         <RecordLink to={`/pets/${id}/edit`} className="button secondary">
@@ -180,21 +192,26 @@ export function PetDetail() {
       <ResourceState resource={resource} />
       <section className="patient-summary">
         <div className="pet-photo">
-          {pet?.photo_url?.startsWith('/') &&
-          !pet.photo_url.startsWith('//') ? (
-            <img src={pet.photo_url} alt={`${pet.name}, patient photograph`} />
+          {photoUrl && failedPhoto !== photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={`${pet.name}, patient photograph`}
+              onError={() => setFailedPhoto(photoUrl)}
+            />
           ) : (
-            <Icon name="pets" size={48} />
+            <span role="img" aria-label="Pet photograph unavailable">
+              <Icon name="pets" size={48} />
+            </span>
           )}
         </div>
         <div>
-          <h2>{pet?.name || 'Patient information unavailable'}</h2>
+          <h2>{pet ? petLabel(pet) : 'Patient information unavailable'}</h2>
           <p>
             <Value>{pet?.species}</Value> · <Value>{pet?.breed}</Value>
           </p>
           {pet?.owner_id && (
             <RecordLink to={`/owners/${pet.owner_id}`} className="text-link">
-              Owner: {pet.owner_name || pet.owner_id}{' '}
+              Owner: {ownerLabel(petOwner(pet))}{' '}
               <Icon name="arrow" size={16} />
             </RecordLink>
           )}
@@ -265,6 +282,14 @@ export function PetDetail() {
             <Facts
               entries={[
                 ['Species', pet?.species],
+                ...(isDog(pet?.species)
+                  ? [[
+                      'Adopted',
+                      typeof pet.adopted === 'boolean'
+                        ? pet.adopted ? 'Yes' : 'No'
+                        : null,
+                    ]]
+                  : []),
                 ['Breed', pet?.breed],
                 ['Sex', pet?.sex],
                 ['Age when date is unknown', pet?.age],

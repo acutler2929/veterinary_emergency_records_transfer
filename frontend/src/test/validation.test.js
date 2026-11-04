@@ -4,9 +4,10 @@ import { normalizeValues, validate } from '../utils/validation';
 
 describe('record input integrity', () => {
   it('requires identity and validates email without changing input', () => {
-    const values = { name: '  ', email: 'invalid', phone: '555-0100' };
+    const values = { first_name: '  ', last_name: '', email: 'invalid', phone: '555-0100' };
     expect(validate(formDefinitions.owner.fields, values)).toMatchObject({
-      name: 'Owner name is required.',
+      first_name: 'First name is required.',
+      last_name: 'Last name is required.',
       email: 'Enter a valid email address.',
     });
     expect(values.phone).toBe('555-0100');

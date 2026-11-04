@@ -56,6 +56,7 @@ p {
   margin-top: 0;
 }
 h1 {
+  overflow-wrap: anywhere;
   font-size: clamp(26px, 2.5vw, 34px);
   line-height: 1.3;
   letter-spacing: -1px;
@@ -124,29 +125,31 @@ small {
   position: sticky;
   top: 0;
   height: 100vh;
+  overflow-y: auto;
   padding: 32px 20px 20px;
 }
 .brand {
   display: flex;
-  gap: 11px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
   text-decoration: none;
-  font-size: 27px;
+  font-size: 34px;
   letter-spacing: 2px;
   font-weight: 800;
   color: var(--dark-teal);
 }
-.brand small {
-  font-size: 9px;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-  margin-top: 1px;
+.brand strong {
+  font-weight: 800;
+  line-height: 1.2;
 }
-.brand-symbol {
-  width: 43px;
-  height: 43px;
-  flex-shrink: 0;
-  border: 2px solid var(--teal);
+.brand small {
+  font-size: 10px;
+  letter-spacing: 0.1px;
+  font-weight: 500;
+  margin-top: 4px;
+  color: var(--dark-teal);
+  line-height: 1.5;
 }
 .nav-caption {
   font-size: 9px;
@@ -159,6 +162,51 @@ small {
   display: flex;
   flex-direction: column;
   gap: 7px;
+}
+.nav-help {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+.nav-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 24px;
+  align-items: center;
+}
+.sidebar .nav-item a {
+  padding: 13px 6px;
+  gap: 7px;
+  font-size: 12px;
+}
+.nav-item svg {
+  flex-shrink: 0;
+}
+.nav-drag,
+.nav-moves button {
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--teal);
+  padding: 0;
+  width: 100%;
+  min-height: 24px;
+}
+.nav-drag {
+  cursor: grab;
+}
+.nav-drag:active {
+  cursor: grabbing;
+}
+.nav-moves {
+  display: flex;
+  flex-direction: column;
+}
+.nav-moves button:hover:not(:disabled) {
+  background: #e9f4f3;
+}
+.nav-moves button:disabled {
+  color: #a0b3b5;
 }
 .sidebar nav a,
 .sidebar-bottom > a {
@@ -555,6 +603,11 @@ select:disabled {
   color: var(--muted);
   font-size: 11px;
 }
+.patient-row > div,
+.list-row > strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .row-owner {
   font-size: 11px;
   color: var(--muted);
@@ -730,12 +783,17 @@ td {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 84px;
-  height: 84px;
+  width: 112px;
+  height: 112px;
   border-radius: 15px;
   color: #4c8384;
   background: #eaf3f2;
   overflow: hidden;
+}
+.patient-summary > div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
 }
 .pet-photo img {
   width: 100%;
@@ -828,6 +886,32 @@ td {
 .field small {
   font-size: 10px;
   margin-top: 5px;
+}
+.checkbox-field {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  column-gap: 10px;
+  align-content: start;
+  align-items: center;
+}
+.checkbox-field label {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  padding: 12px 0;
+}
+.checkbox-field input {
+  grid-column: 1;
+  grid-row: 1;
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  accent-color: var(--teal);
+  margin: 0;
+}
+.checkbox-field small,
+.checkbox-field .field-error {
+  grid-column: 1 / -1;
 }
 .field-error {
   color: #a13631;
@@ -1092,6 +1176,13 @@ td {
   .sidebar.open .nav-caption {
     margin-top: 22px;
   }
+  .nav-item {
+    grid-template-columns: 32px minmax(0, 1fr) 44px;
+  }
+  .nav-drag,
+  .nav-moves button {
+    min-height: 44px;
+  }
   .sidebar-bottom {
     margin-top: 25px;
   }
@@ -1171,8 +1262,8 @@ td {
     justify-content: space-between;
   }
   .pet-photo {
-    width: 65px;
-    height: 65px;
+    width: 80px;
+    height: 80px;
   }
   table {
     font-size: 11px;
@@ -1199,9 +1290,19 @@ td {
   .auth-story {
     padding: 23px;
   }
-  .auth-story-content,
+  .auth-feature,
+  .auth-story-content .eyebrow,
   .auth-footnote {
     display: none;
+  }
+  .auth-story-content {
+    margin: 0;
+    padding: 20px 0 0;
+  }
+  .auth-story-content h1 {
+    font-size: 23px;
+    letter-spacing: -0.5px;
+    margin: 0;
   }
   .auth-main {
     min-height: calc(100vh - 92px);
