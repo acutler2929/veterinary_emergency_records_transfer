@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from datetime import date, timedelta
@@ -5,7 +6,6 @@ from datetime import date, timedelta
 class User(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     user_name = models.CharField(max_length=100, default="No Name")
-    user_permissions = models.CharField(max_length=100, blank=True)   # TODO: (e.g. "pet owner", "medical provider", "admin") - implement into views and templates
     first_name = models.CharField(max_length=100, blank=True)   # TODO: implement into views and templates
     last_name = models.CharField(max_length=100, blank=True)    # TODO: implement into views and templates
     title = models.CharField(max_length=100, blank=True)        # TODO: implement into views and templates (e.g. "Dr.", "Mr.", "Ms.")
@@ -19,7 +19,7 @@ class User(models.Model):
 
 
 class PetOwner(models.Model):                                   # TODO: implement into views and templates
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     home_address = models.TextField(blank=True)
     emergency_contact_name = models.CharField(max_length=150, blank=True)
     emergency_contact_phone = models.CharField(max_length=30, blank=True)
@@ -33,7 +33,7 @@ class PetOwner(models.Model):                                   # TODO: implemen
     
 
 class MedicalProvider(models.Model):                                  # TODO: implement into views and templates
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     medical_role = models.CharField(max_length=100, blank=True)         # TODO: (e.g. "nurse", "vet tech", "veterinarian")
     veterinarian_name = models.CharField(max_length=150, blank=True)
     clinic_name = models.CharField(max_length=150, blank=True)
@@ -42,6 +42,18 @@ class MedicalProvider(models.Model):                                  # TODO: im
     def __str__(self) -> str:
         return self.clinic_name or self.veterinarian_name or "Medical Provider"
 
+class Profile(models.Model):
+    class Role(models.TextChoices):
+        PET_OWNER = 'pet owner', 'Pet owner'
+        MEDICAL_PROVIDER = 'medical provider', 'Medical provider'
+        ADMIN = 'admin', 'Admin'
+
+    # one per sign-in account, blank role means account sees nothing
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    role = models.CharField(max_length=20, choices=Role.choices, blank=True)
+
+    def __str__(self):
+        return f"{self.user} ({self.get_role_display() or 'no role'})"
 
 # class Pet(models.Model):
 #     class Species(models.TextChoices):
