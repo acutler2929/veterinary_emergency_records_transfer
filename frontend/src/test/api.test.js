@@ -62,11 +62,21 @@ describe('Django request boundary', () => {
     );
     await expect(authApi.session()).rejects.toMatchObject({ status: 0 });
   });
+  it('loads the dashboard from django', async () => {
+    const data = { patients: [], recent_records: [], upcoming_visits:[], owners: [] };
+    const fetch = vi.fn().mockResolvedValue(response(data));
+    vi.stubGlobal('fetch', fetch);
+    await expect(recordsApi.dashboard()).resolves.toEqual(data);
+    expect(fetch.mock.calls[0][0]).toBe('/api/frontend/dashboard/');
+    expect(fetch.mock.calls[0][1]).toMatchObject({ credentials: 'same-origin' });
+  })
   it('pending record operations do not issue requests', async () => {
     const fetch = vi.fn();
     vi.stubGlobal('fetch', fetch);
-    for (const operation of Object.values(recordsApi))
+    for (const [name, operation] of Object.entries(recordsApi)) {
+      if (name == 'dashboard') continue;
       await expect(operation()).rejects.toMatchObject({ pending: true });
+    }
     expect(fetch).not.toHaveBeenCalled();
     expect(Object.values(integrated).every((value) => value === false)).toBe(
       true,
