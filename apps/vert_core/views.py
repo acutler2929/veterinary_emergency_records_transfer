@@ -1,11 +1,16 @@
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User
 from .roles import get_role
 
 @login_required
 def users(request):
+    role = get_role(request)
     if request.method == 'POST':
+        if not role.can_add_records:
+            return HttpResponseForbidden("Account has no role, therefore, cannot add records")
         data = request.POST
         pet_image = request.FILES.get('pet_image')
         user_name = data.get('user_name')
@@ -19,16 +24,16 @@ def users(request):
         )
         return redirect('/')
 
-    role = get_role(request)
     queryset = role.visible_records(request)
     if request.GET.get('search'):
         queryset = queryset.filter(user_name__icontains=request.GET.get('search'))
 
-    context = {'users': queryset}
+    context = {'users': queryset, 'can_add_records': role.can_add_records}
     return render(request, role.template_name, context)
 
 
 @login_required
+@require_POST
 def delete_user(request, id):
     user = get_object_or_404(get_role(request).visible_records(request), id=id)
     user.delete()
