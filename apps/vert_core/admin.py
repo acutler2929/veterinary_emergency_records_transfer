@@ -1,7 +1,26 @@
 from django.contrib import admin
-from .models import User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+from .models import Profile, User
 
 admin.site.register(User)
+
+
+class ProfileInLine(admin.StackedInline):
+    model = Profile
+    can_delete = False
+    fields = ['role']
+
+
+class AccountAdmin(UserAdmin):
+    inlines = [ProfileInLine]
+
+    def get_inlines(self, request, obj):
+        return self.inlines if obj else[]
+
+
+admin.site.unregister(get_user_model())
+admin.site.register(get_user_model(), AccountAdmin)
 
 # from django.contrib import admin
 

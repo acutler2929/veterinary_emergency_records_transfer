@@ -22,7 +22,7 @@
     
     <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <h2 class="text  text-center"> Vert Dashboard </h2>
+        <h2 class="text  text-center">{% block dashboard_heading %} Vert Dashboard {% endblock %}</h2>
 
         <div>
             {% if user.is_authenticated %}
@@ -44,6 +44,7 @@
             </ul>
         </div>
 
+        {% if can_add_records %}
         <br>
         <h3>Add User</h3>
         <hr>
@@ -61,6 +62,9 @@
           </div>
        
         <button type="submit" class="btn" style="background-color: #005229; color: white;">Add User</button>
+        {% else %}
+        <p>Your account doesn't have a role yet, so you can't add records. Ask an admin to give you one.</p>
+        {% endif %}
       </form>
  
       <hr>
@@ -96,7 +100,10 @@
             <td>
                 <img src="/media/{{user.pet_image}}" style="height: 100px;"> </td>
                 <td>
-                    <a href="/delete_user/{{user.id }}" class="btn btn-danger m-2">Delete</a>
+                    <form method="post" action="/delete_user/{{ user.id }}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger m-2" onclick="return confirm('Delete {{ user.user_name|escapejs }}? This cannot be undone.');">Delete</button>></button>
+                    </form>
                     <a href="/update_user/{{user.id }}" class="btn btn-success">Update</a>
                 </td>
           </tr>

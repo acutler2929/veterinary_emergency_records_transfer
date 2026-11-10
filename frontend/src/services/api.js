@@ -100,7 +100,7 @@ function pending(feature) {
 // timestamp, action and target. Backend must log every protected read and write.
 // Replace these explicit pending functions only after agreeing and implementing contracts.
 export const recordsApi = {
-  dashboard: () => pending('loading the dashboard'),
+  dashboard: () => request('/api/frontend/dashboard/'),
   owners: () => pending('loading owner profiles'),
   owner: (_id) => pending('loading this owner'),
   saveOwner: (_values, _id) => pending('saving owner profiles'),

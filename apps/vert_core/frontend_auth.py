@@ -9,9 +9,12 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET, require_POST
 
+from .roles import ROLES, get_role
+
 
 def session_data(request):
     user = None
+    role = None
     if request.user.is_authenticated:
         user = {
             "id": request.user.pk,
@@ -19,10 +22,13 @@ def session_data(request):
             "name": request.user.get_full_name() or request.user.get_username(),
             "email": request.user.email,
         }
+        current = get_role(request)
+        role = next((name for name, known in ROLES.items() if known is current), None)
     # BACKEND TODO: Return approved clinic membership and record permissions for
     # AppLayout and record forms. Account authentication alone is not provider approval.
     return {
         "user": user,
+        "role": role,
         "permissions": {},
         "csrf_token": get_token(request),
         "login_label": str(LoginForm(request=request).fields["login"].label),
