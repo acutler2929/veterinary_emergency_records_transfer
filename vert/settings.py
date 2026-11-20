@@ -85,7 +85,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-# STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "apps/vert_core/dist"]   # This is the directory where Vite will output the compiled frontend assets
+# STATIC_ROOT = BASE_DIR / "staticfiles"  # This is the directory where Django will collect static files (production only)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

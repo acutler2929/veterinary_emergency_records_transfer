@@ -14,6 +14,13 @@ export default defineConfig(({ mode }) => {
         '/accounts': { target: backend },
       },
     },
+    // Django maps the contents of dist/ directly to the root of /static/.
+    base: '/static/',
+    // Folder Vite sends the compiled build to.
+    build: {
+      outDir: '../apps/vert_core/dist',
+      emptyOutDir: true,
+    },
     test: {
       environment: 'jsdom',
       setupFiles: './src/test/setup.js',
